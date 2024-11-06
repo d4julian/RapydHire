@@ -1,0 +1,43 @@
+email: "user@example.com"
+phone: "+1-123-456-7890"
+full_name: "John Doe"
+location: "New York, NY"
+resume_path: "assets/resume.pdf"
+linkedin_email: "user@example.com"
+linkedin_password: "your_linkedin_password"
+years_of_experience: 5
+education:
+  - degree: "Bachelor of Science"
+    field: "Computer Science"
+    school: "Example University"
+    graduation_year: 2018
+  - degree: "Master of Science"
+    field: "Software Engineering"
+    school: "Tech University"
+    graduation_year: 2020
+work_experience:
+  - title: "Software Engineer"
+    company: "Tech Corp"
+    start_date: "2020-01"
+    end_date: "Present"
+    description: "Developed full-stack applications using Python and React"
+  - title: "Junior Developer"
+    company: "Startup Inc"
+    start_date: "2018-06"
+    end_date: "2019-12"
+    description: "Built and maintained web applications"
+skills:
+  - "Python"
+  - "JavaScript"
+  - "React"
+  - "SQL"
+  - "Git"
+desired_job_titles:
+  - "Software Engineer"
+  - "Full Stack Developer"
+  - "Python Developer"
+preferred_locations:
+  - "New York, NY"
+  - "Remote"
+  - "San Francisco, CA"
+minimum_salary: 100000

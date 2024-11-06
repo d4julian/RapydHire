@@ -1,0 +1,7 @@
+selenium
+langchain
+ollama
+python-dotenv
+pydantic
+asyncio
+pyyaml
