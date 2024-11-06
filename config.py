@@ -28,3 +28,5 @@ def load_user_profile(config_path: str) -> UserProfile:
     with open(config_path, 'r') as f:
         data = yaml.safe_load(f)
     return UserProfile(**data)
+
+user_profile = load_user_profile("assets/config.yaml")

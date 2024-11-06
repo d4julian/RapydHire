@@ -5,3 +5,5 @@ python-dotenv
 pydantic
 asyncio
 pyyaml
+webdriver-manager
+langchain_community
