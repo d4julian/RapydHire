@@ -82,7 +82,7 @@ class AppConfig:
     experience_level: Dict[str, bool]
     job_types: Dict[str, bool]
     date: Dict[str, bool]
-    positions: List[str]
+    position: str
     locations: List[str]
     apply_once_at_company: bool
     distance: int

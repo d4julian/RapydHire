@@ -14,10 +14,8 @@ job_types:
   full_time: true
   contract: true
   part_time: true
-  temporary: true
   internship: true
-  other: true
-  volunteer: false
+
 
 date:
   all_time: false
@@ -25,23 +23,11 @@ date:
   week: true
   24_hours: true
 
-positions:
-  - Software Intern
+position: 'Software Intern'
 
 locations:
-  - United States
-  - San Francisco
-  - New York City
-  - Seattle
-  - Austin
-  - Boston
-  - Los Angeles
-  - Chicago
-  - Denver
-  - Raleigh
-  - Atlanta
-  - Florida
-  - Miami
+  - '102571732' # New York, New York
+  - '103644278' # United States
 
 apply_once_at_company: true
 
