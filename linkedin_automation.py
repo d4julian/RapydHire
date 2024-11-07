@@ -14,7 +14,7 @@ from job import Job
 class LinkedInAutomation:
 
     def __init__(self):
-        self.driver = None  # Initialize driver to None
+        self.initialize_driver()
 
     def initialize_driver(self):
         chrome_options = Options()
@@ -58,12 +58,15 @@ class LinkedInAutomation:
             if new_height == last_height:
                 break
             last_height = new_height
+        # Scroll back to top of page
+        self.driver.execute_script("window.scrollTo(0, 0);")
+        time.sleep(2)  # Wait for page to load
 
-    def createQuery(self, app_config: AppConfig) -> str:
-        query_parts = "https://www.linkedin.com/jobs/search/?"
+    def createQuery(self) -> str:
+        query_parts = ["https://www.linkedin.com/jobs/search/?"]
         
         # Add position titles first
-        if app_config.position: query_parts.append(f"keywords={'+'.join(app_config.position)}&f_AL=true")
+        if app_config.position: query_parts.append(f"keywords={app_config.position.replace(' ', '+')}&f_AL=true")
         query_parts.append(f"&distance={app_config.distance}")
         
         # Add work preferences
@@ -74,19 +77,19 @@ class LinkedInAutomation:
             if app_config.hybrid: site_string += "3,"
             query_parts.append(site_string[:-1])  # Remove trailing comma        
         # Add experience levels
-        if app_config.experience_levels:
+        if app_config.experience_level:
             experience_string = "&f_E="
-            if app.config.experience_levels["internship"]: experience_string += "1,"
-            if app_config.experience_levels["entry_level"]: experience_string += "2,"
-            if app_config.experience_levels["associate"]: experience_string += "3,"
-            if app_config.experience_levels["mid_senior_level"]: experience_string += "4,"
-            if app_config.experience_levels["director"]: experience_string += "5,"
-            if app_config.experience_levels["executive"]: experience_string += "6,"
+            if app_config.experience_level["internship"]: experience_string += "1,"
+            if app_config.experience_level["entry_level"]: experience_string += "2,"
+            if app_config.experience_level["associate"]: experience_string += "3,"
+            if app_config.experience_level["mid_senior_level"]: experience_string += "4,"
+            if app_config.experience_level["director"]: experience_string += "5,"
+            if app_config.experience_level["executive"]: experience_string += "6,"
             query_parts.append(experience_string[:-1])
         # Add distance
         query_parts.append(f"&distance={app_config.distance}")
         # Add locations
-        if app_config.locations: query_parts.append(f"&location={'+'.join(app_config.locations[0])}")
+        if app_config.locations: query_parts.append(f"&location={''.join(app_config.locations[0])}")
         # Add job types
         if app_config.job_types:
             job_type_string = "&f_JT="
@@ -96,54 +99,117 @@ class LinkedInAutomation:
             if app_config.job_types["internship"]: job_type_string += "I,"
             query_parts.append(job_type_string[:-1])
         # Add date posted
-        if app_config.date_posted:
+        if app_config.date:
             date_string = "&f_TPR="
-            if app_config.date_posted["24_hours"]: date_string += "r86400,"
-            elif app_config.date_posted["week"]: date_string += "r604800,"
-            elif app_config.date_posted["month"]: date_string += "r2592000,"
-            elif app_config.date_posted["any_time"]: date_string = ""
+            if app_config.date["24_hours"]: date_string += "r86400,"
+            elif app_config.date["week"]: date_string += "r604800,"
+            elif app_config.date["month"]: date_string += "r2592000,"
+            elif app_config.date["any_time"]: date_string = ""
             query_parts.append("" if date_string == "" else date_string[:-1])
         
-        
-        
-        # Join all parts with &
+        print(f"Query: {''.join(query_parts)}")
         return ''.join(query_parts)
 
-    def search(self, query: str):
-        formatted_query = query.replace(' ', '+')
-        base_url = "https://www.linkedin.com/jobs/search/?"
-        params = {
-            'keywords': formatted_query,
-            'distance': f"{app_config.distance}.0",
-            'f_WT': 2 if app_config.remote else None,  # 2 is LinkedIn's code for remote jobs
-        }
-        
-        # Build URL with & before each parameter
-        
-        self.driver.get(createQuery(app_config))
-
-    def search_jobs(self, timeout=60) -> List[Job]:
-        self.driver.get("https://www.linkedin.com/jobs/")
+    def search_jobs(self, timeout=60):
+        time.sleep(2)
+        jobs = []
+        self.driver.get(self.createQuery())
         try:
-            logger.info("Searching for jobs...")
-            print(f"Attempting to load jobs page...")
+            print("Attempting to load jobs page...")
             WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Search jobs']")))
-            print(f"Jobs page loaded successfully!")
+                EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'jobs-search__job-details')]")))
+            print("Jobs page loaded successfully!")
             self.scroll_to_bottom()
         
-            job_cards = self.driver.find_elements(By.XPATH, "//li[contains(@class, 'job-card-container')]")
+            job_cards = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'job-card-list')]")
+
+            for card in job_cards:
+                card.click()
+                job = Job(
+                    title=self.driver.find_element(By.XPATH, "//div[contains(@class, 'job-title')]").text, 
+                    company=self.driver.find_element(By.XPATH, "//div[contains(@class, 'company-name')]").text)
+                print(f"Checking job: {job.title} at {job.company}...")
+                if any(existing_job.company == job.company for existing_job in jobs):
+                    print("Already applied at this company. Skipping...")
+                    continue
+
+                if job.company in job_cards:
+                    print("Job already applied to. Skipping...")
+                    continue
+
+                easy_apply = False
+                applied = False
+                for element in card.find_elements(By.XPATH, "//*"):
+                    if element.text == "Applied":
+                        applied = True
+                        break
+                    if element.text == "Easy Apply": easy_apply = True
+
+                if not easy_apply or applied: 
+                    print("Job already applied to. Skipping..." if applied else "Job does not have Easy Apply. Skipping...")
+                    continue
+
+                print("hi")
+
+                job.description = WebDriverWait(driver, timeout).until(
+                    EC.presence_of_element_located(By.XPATH, "//div[contains(@class, 'jobs-description-content__text')]")).text
+
+                # easy_apply_jobs.append(job)
+                print(f"Attempting to apply: {job.title} at {job.company}")
+                jobs.append(job)
+                if not self.click_apply_button():
+                    print("Failed to find Easy Apply button. Skipping...")
+                    continue
+                time.sleep(2)
             
             print("Reached bottom of page")
         except TimeoutException:
             print(f"Jobs page failed to load. Please try again.")
             self.driver.quit()
             raise Exception("Jobs page failed to load")
-        return []
+        return jobs
 
-    def apply_to_job(self, job_url: str):
-        self.driver.get(job_url)
-        # TODO: Implement job application logic
+    def click_apply_button(self) -> bool:
+        search_methods = [
+            {
+                'description': "find all 'Easy Apply' buttons using find_elements",
+                'find_elements': True,
+                'xpath': '//button[contains(@class, "jobs-apply-button") and contains(., "Easy Apply")]'
+            },
+            {
+                'description': "'aria-label' containing 'Easy Apply to'",
+                'xpath': '//button[contains(@aria-label, "Easy Apply to")]'
+            },
+            {
+                'description': "button text search",
+                'xpath': '//button[contains(text(), "Easy Apply") or contains(text(), "Apply now")]'
+            }
+        ]
+        for method in search_methods:
+            try:
+                if method.get('find_elements'):
+                    buttons = self.driver.find_elements(By.XPATH, method.get('xpath'))
+                else:
+                    buttons = [self.driver.find_element(By.XPATH, method.get('xpath'))]
+                if len(buttons) > 0:
+                    print(f"Found {len(buttons)} buttons using {method.get('description')}")
+                    for button in buttons:
+                        button.click()
+                        return True
+            except Exception as e:
+                print(f"Error occurred while trying to find buttons using {method.get('description')}: {e}")
+                return False
+        
+        return False
+
+    def apply_to_job(self, job: Job):
+        print(f"Attempting to apply to job: {job.title} at {job.company}")
+        button = WebDriverWait(driver, timeout).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'Easy Apply')]")))
+
+        button.click()
+        time.sleep(5)
+        
         
     def __del__(self):
         if self.driver is not None: self.driver.quit()

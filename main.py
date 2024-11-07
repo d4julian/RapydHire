@@ -6,8 +6,6 @@ from ai_parser import AIJobParser
 def main():
     linkedin_bot = LinkedInAutomation()
     try:
-        print(f"User profile: {user_profile}")
-        print(f"App config: {app_config}")
         linkedin_bot.login()
         
         ai_parser = AIJobParser()

@@ -4,7 +4,7 @@ onsite: true
 
 experience_level:
   internship: true
-  entry: false
+  entry_level: false
   associate: false
   mid_senior_level: false
   director: false
@@ -26,8 +26,8 @@ date:
 position: 'Software Intern'
 
 locations:
-  - '102571732' # New York, New York
   - '103644278' # United States
+  - '102571732' # New York, New York
 
 apply_once_at_company: true
 
