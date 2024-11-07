@@ -1,6 +1,6 @@
 import asyncio
-from ollama import Chat
-from config import load_user_profile
+from ollama import AsyncClient
+from config import user_profile
 
 class AIJobParser:
     def __init__(self):
@@ -16,13 +16,14 @@ class AIJobParser:
         Analyze the following job description and extract key requirements:
         {description}
         """
+        print(f"Prompt: {prompt}")
         return await self.generate(prompt)
 
-    async def answer_question(self, user_profile: UserProfile, question: str) -> str:
+    async def answer_question(self, question: str) -> str:
         prompt = f"""
-        Given this user profile: {user_profile}
+        Given this user profile: {user_profile.to_dict()}
         Generate a professional response to this application question: {question}
         Please only give me a response and not the question itself. Do not apply markdown formatting.
         """
+        print(f"Prompt: {prompt}")
         return await self.generate(prompt)
-    

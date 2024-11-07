@@ -1,0 +1,146 @@
+personal_information:
+  first_name: "Julian"
+  last_name: "Ubico"
+  date_of_birth: "01/18/2003"
+  country: "USA"
+  city: "Miami"
+  address: "2630 SW 79th AVE"
+  zip_code: "33155"
+  phone_prefix: "+1"
+  phone: "3058988892"
+  email: "julianubico@gmail.com"
+  github: "https://github.com/d4julian"
+  linkedin: "https://www.linkedin.com/in/julianubico/"
+
+education_details:
+  - education_level: "Bachelor of Science"
+    institution: "University of Florida"
+    field_of_study: "Computer Science"
+    final_evaluation_grade: "3.2/4"
+    start_date: "2021"
+    year_of_completion: "2025"
+    exam:
+
+experience_details:
+  - position: "Software Engineer Intern"
+    company: "Tech For Good Inc."
+    employment_period: "06/2021 - 08/2021"
+    location: "Boston, Massachusetts"
+    industry: "Technology"
+    key_responsibilities:
+      - responsibility_1: "Engineered cloud optimization solutions in Python using the PyTorch library as part of FLANT, an ML-powered engine,
+trimming cloud costs for small organizations by up to 30% with spot usage optimization and minimizing resource waste."
+      - responsibility_2: "Collaborated with cross-functional teams in daily Agile stand-ups, identifying key milestones and iterating on project
+requirements, which led to the successful completion of eight critical deliverables ahead of schedule within two months."
+    skills_acquired:
+      - "Python"
+      - "Machine Learning"
+      - "Agile Methodology"
+      - "Cloud Optimization"
+      - "Resource Management"
+
+  - position: "Co-Owner"
+    company: "DirtCraft Modded Minecraft Network"
+    employment_period: "10/2018 - 08/2023"
+    location: "Miami, FL"
+    industry: "Technology"
+    key_responsibilities:
+      - responsibility_1: "Founded and managed DirtCraft, which became the #1 modded Minecraft network in the world, attracting over 100,000
+unique players with its multiple interconnected servers, websites, and databases."
+      - responsibility_2: "Maintained 99.9% uptime by leveraging a robust technology stack, including Java, MySQL, NGINX, Jenkins, and Linux-based
+systems to ensure high performance, scalability, and continuous integration across the network."
+    skills_acquired:
+      - "Server Management"
+      - "Database Management"
+      - "Continuous Integration"
+      - "Scalability"
+      - "API Development"
+  - position: "Electric Vehicle Service Intern"
+    company: "Tesla Motors"
+    employment_period: "06/2023 - 08/2023"
+    location: "Miami Gardens, FL"
+    industry: "Automotive"
+    key_responsibilities:
+      - responsibility_1: "Performed hands-on training in Tesla EV systems, acquired expertise in mechanical and electrical troubleshooting from senior
+technicians, and gained comprehensive knowledge of Tesla vehicle products, safety standards, and repair protocols."
+    skills_acquired:
+      - "Electrical Troubleshooting"
+      - "Technical Training"
+      - "Advanced Diagnostics"
+
+projects:
+  - name: "Pharma Vision (ShellHacks 2024)"
+    description: "Developed a full-stack healthcare application to streamline communication between doctors, pharmacists, and patients by tracking
+and managing patient prescriptions."
+    link: "https://github.com/d4julian/pharma-vision/"
+
+  - name: "Full Stack Server Administration Panel"
+    description: "Pioneered a full stack administration panel for DirtCraft, utilizing React for the front end and Express with Java for the
+backend, seamlessly integrated with MySQL databases."
+    link: "https://github.com/d4julian/Dirt-Panel"
+
+  - name: "Modded Minecraft Launcher"
+    description: "Designed a modded Minecraft launcher in JavaFX, adopted by over 5,000 users, providing an intuitive interface for managing
+game mods and updates and significantly enhancing the overall user experience."
+    link: "https://github.com/Dirt-Craft/Dirt-Launcher"
+  
+  - name: "Modular Discord Bot"
+    description: "Created a fully modular Discord bot powered by JDA, featuring a comprehensive ticket support system, real-time server
+tracking, music playback, and various moderation commands, enabling seamless community and server support management."
+    link: "https://github.com/Dirt-Craft/DirtBot"
+
+achievements:
+
+certifications:
+
+languages:
+  - language: "English"
+    proficiency: "Native"
+  - language: "Spanish"
+    proficiency: "Fluent"
+
+interests:
+  - "Programming"
+  - "Machine Learning"
+  - "Open Source Contribution"
+
+availability:
+  notice_period: "2 weeks"
+
+salary_expectations:
+  salary_range_usd: "50000 - 60000"
+
+self_identification:
+  gender: "Male"
+  pronouns: "He/Him"
+  veteran: "No"
+  disability: "No"
+  ethnicity: "Hispanic/Latino"
+
+
+legal_authorization:
+  eu_work_authorization: "No"
+  us_work_authorization: "Yes"
+  requires_us_visa: "No"
+  requires_us_sponsorship: "No"
+  requires_eu_visa: "No"
+  legally_allowed_to_work_in_eu: "No"
+  legally_allowed_to_work_in_us: "Yes"
+  requires_eu_sponsorship: "No"
+  canada_work_authorization: "No"
+  requires_canada_visa: "No"
+  legally_allowed_to_work_in_canada: "Yes"
+  requires_canada_sponsorship: "Yes"
+  uk_work_authorization: "No"
+  requires_uk_visa: "No"
+  legally_allowed_to_work_in_uk: "No"
+  requires_uk_sponsorship: "No"
+
+
+work_preferences:
+  remote_work: "Yes"
+  in_person_work: "Yes"
+  open_to_relocation: "Yes"
+  willing_to_complete_assessments: "Yes"
+  willing_to_undergo_drug_tests: "Yes"
+  willing_to_undergo_background_checks: "Yes"

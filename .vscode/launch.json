@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/main.py",
             "console": "integratedTerminal",
-            "pythonPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe"
+            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe"
         }
     ]
 }
