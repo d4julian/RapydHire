@@ -116,58 +116,151 @@ class LinkedInAutomation:
         self.driver.get(self.createQuery())
         try:
             print("Attempting to load jobs page...")
-            WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'jobs-search__job-details')]")))
+            # Wait for job list to load
+            job_list = WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "jobs-search-results-list"))
+            )
+            time.sleep(2)  # Wait for page to load
             print("Jobs page loaded successfully!")
             self.scroll_to_bottom()
-        
-            job_cards = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'job-card-list')]")
+
+            # Get all job cards
+            job_cards = WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_all_elements_located(
+                    (By.CSS_SELECTOR, ".job-card-list")
+                )
+            )
 
             for card in job_cards:
-                card.click()
-                job = Job(
-                    title=self.driver.find_element(By.XPATH, "//div[contains(@class, 'job-title')]").text, 
-                    company=self.driver.find_element(By.XPATH, "//div[contains(@class, 'company-name')]").text)
-                print(f"Checking job: {job.title} at {job.company}...")
-                if any(existing_job.company == job.company for existing_job in jobs):
-                    print("Already applied at this company. Skipping...")
+                try:
+                    # Wait for card to be clickable
+                    print(1)
+                    WebDriverWait(self.driver, 10).until(
+                        EC.element_to_be_clickable(card)
+                    ).click()
+                    time.sleep(2)  # Wait for job details to load
+                    print(1)
+
+                    # Get job details with explicit waits
+                    title = WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, ".job-details-jobs-unified-top-card__job-title")
+                        )
+                    ).text
+                    print(1)
+                    company = WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, ".job-details-jobs-unified-top-card__company-name")
+                        )
+                    ).text
+                    print(1)
+
+                    job = Job(title=title, company=company)
+                    print(f"Checking job: {job.title} at {job.company}...")
+
+                    if any(existing_job.company == job.company and existing_job.title == job.title for existing_job in jobs):
+                        print("Already applied at this company. Skipping...")
+                        continue
+
+                    # Check if job is already applied to or has Easy Apply
+                    easy_apply_button = self.driver.find_elements(
+                        By.CSS_SELECTOR, 
+                        "button.jobs-apply-button[aria-label*='Easy Apply']"
+                    )
+                    
+                    if not easy_apply_button:
+                        print("Job does not have Easy Apply. Skipping...")
+                        continue
+
+                    # Get job description
+                    description = WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, ".jobs-description-content__text")
+                        )
+                    ).text
+                    job.description = description
+
+                    jobs.append(job)
+                    print(f"Found applicable job: {job.title} at {job.company}")
+                    self.click_apply_button()
+
+                except TimeoutException:
+                    print("Timeout while processing job card. Skipping...")
+                    continue
+                except Exception as e:
+                    print(f"Error processing job card: {e}")
                     continue
 
-                if job.company in job_cards:
-                    print("Job already applied to. Skipping...")
-                    continue
+            print(f"Found {len(jobs)} potential jobs to apply to")
+            return jobs
 
-                easy_apply = False
-                applied = False
-                for element in card.find_elements(By.XPATH, "//*"):
-                    if element.text == "Applied":
-                        applied = True
-                        break
-                    if element.text == "Easy Apply": easy_apply = True
-
-                if not easy_apply or applied: 
-                    print("Job already applied to. Skipping..." if applied else "Job does not have Easy Apply. Skipping...")
-                    continue
-
-                print("hi")
-
-                job.description = WebDriverWait(driver, timeout).until(
-                    EC.presence_of_element_located(By.XPATH, "//div[contains(@class, 'jobs-description-content__text')]")).text
-
-                # easy_apply_jobs.append(job)
-                print(f"Attempting to apply: {job.title} at {job.company}")
-                jobs.append(job)
-                if not self.click_apply_button():
-                    print("Failed to find Easy Apply button. Skipping...")
-                    continue
-                time.sleep(2)
-            
-            print("Reached bottom of page")
         except TimeoutException:
-            print(f"Jobs page failed to load. Please try again.")
-            self.driver.quit()
-            raise Exception("Jobs page failed to load")
-        return jobs
+            print("Jobs page failed to load. Please try again.")
+            raise
+        except Exception as e:
+            print(f"Error during job search: {e}")
+            return []
+
+    def apply_to_job(self, job: Job):
+        try:
+            self.click_apply_button()
+            print(f"Attempting to apply to job: {job.title} at {job.company}")
+            time.sleep(5)
+        # Fill out application form
+            while True:
+                dropdowns = self.driver.find_elements(By.CSS_SELECTOR, "div[data-test-text-entity-list-form-component]")
+                text_inputs = self.driver.find_elements(By.CLASS_NAME, "artdeco-text-input--container")
+
+                for dropdown in dropdowns:
+                    label = dropdown.find_element(By.TAG_NAME, "label").text
+                    select = dropdown.find_element(By.TAG_NAME, "select")
+                    options = select.find_elements(By.TAG_NAME, "option")
+
+                    # Logic to select dropdown option
+                    options[0].click()
+                    time.sleep(2)
+
+                for text_input in text_inputs:
+                    label = text_input.find_element(By.TAG_NAME, "label").text
+                    input_field = text_input.find_element(By.TAG_NAME, "input")
+
+                    # Logic to fill out text input
+                    input_field.send_keys("Test")
+                    time.sleep(2)
+
+
+                upload_button = self.driver.find_element(By.CSS_SELECTOR, 
+                    "button[aria-label='Upload resume button. Only, DOC, DOCX, PDF formats are supported. Max file size is (2 MB).']")
+                
+                if upload_button:
+                    upload_button = self.driver.find_element(By.CSS_SELECTOR, "input[type='file']")
+                    upload_button.send_keys(os.path.abspath(".\\assets\\resume.pdf"))
+                    print("Resume uploaded successfully!")
+                    time.sleep(2)
+                
+                # Click next button
+                next_button = self.driver.find_element(By.CSS_SELECTOR, "button[data-easy-apply-next-button]")
+                if not next_button: break
+                next_button.click()
+                time.sleep(2)
+        
+            # Review application
+            review_button = driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Review your application"]')
+            if not review_button: return False
+            review_button.click()
+            time.sleep(2)
+            
+            submit_button = driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Submit application"]')
+            if not submit_button: return False
+            submit_button.click()
+
+        except Exception as e:
+            print(f"Error applying to job: {e}")
+            return False
+
+
+    def select_dropdown_option(self, dropdown: str, option: str):
+        pass
 
     def click_apply_button(self) -> bool:
         search_methods = [
@@ -201,14 +294,6 @@ class LinkedInAutomation:
                 return False
         
         return False
-
-    def apply_to_job(self, job: Job):
-        print(f"Attempting to apply to job: {job.title} at {job.company}")
-        button = WebDriverWait(driver, timeout).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'Easy Apply')]")))
-
-        button.click()
-        time.sleep(5)
         
         
     def __del__(self):
