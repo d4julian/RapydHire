@@ -230,18 +230,9 @@ class LinkedInAutomation:
                     label = text_input.find_element(By.TAG_NAME, "label").text
                     input_field = text_input.find_element(By.TAG_NAME, "input")
 
-                    stream_thread = Thread(target=self.start_streaming_answer, args=(label,))
-                    stream_thread.start()
+                    stream = self.generator.answer_question(label, stream=True)
+                    for chunk in stream: input_field.send_keys(chunk)
 
-                    while stream_thread.is_alive() or not self.answer_queue.empty():
-                        try:
-                            part = self.answer_queue.get(timeout=0.1)  # Wait briefly for a new part
-                            input_field.send_keys(part)
-                        except Empty:
-                            pass 
-                    
-
-                    stream_thread.join()
                     time.sleep(2)
 
 
@@ -273,12 +264,6 @@ class LinkedInAutomation:
         except Exception as e:
             print(f"Error applying to job: {e}")
             return False
-    
-    def start_streaming_answer(self, label):
-        asyncio.run(self.stream_response(label))
-    async def stream_response(self, question: str):
-        async for part in self.generator.answer_question_stream(question):
-            self.answer_queue.put(part['response'])
 
 
     def select_dropdown_option(self, dropdown: str, option: str):
