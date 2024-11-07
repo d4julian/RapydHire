@@ -8,7 +8,7 @@ def main():
     try:
         linkedin_bot.login()
         
-        ai_parser = AIJobParser()
+        
 
 
     except Exception as e: 

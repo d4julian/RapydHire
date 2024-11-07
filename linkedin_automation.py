@@ -10,11 +10,15 @@ from config import user_profile, app_config
 import time
 import os  # Added import
 from job import Job
+from ai_parser import AIJobParser
+import asyncio
+from queue import Queue, Empty
 
 class LinkedInAutomation:
 
     def __init__(self):
         self.initialize_driver()
+        self.generator = AIJobParser()
 
     def initialize_driver(self):
         chrome_options = Options()
@@ -127,7 +131,7 @@ class LinkedInAutomation:
             # Get all job cards
             job_cards = WebDriverWait(self.driver, timeout).until(
                 EC.presence_of_all_elements_located(
-                    (By.CSS_SELECTOR, ".job-card-list")
+                    (By.CSS_SELECTOR, ".job-card-container")
                 )
             )
 
@@ -210,6 +214,8 @@ class LinkedInAutomation:
             while True:
                 dropdowns = self.driver.find_elements(By.CSS_SELECTOR, "div[data-test-text-entity-list-form-component]")
                 text_inputs = self.driver.find_elements(By.CLASS_NAME, "artdeco-text-input--container")
+                
+                
 
                 for dropdown in dropdowns:
                     label = dropdown.find_element(By.TAG_NAME, "label").text
@@ -224,8 +230,18 @@ class LinkedInAutomation:
                     label = text_input.find_element(By.TAG_NAME, "label").text
                     input_field = text_input.find_element(By.TAG_NAME, "input")
 
-                    # Logic to fill out text input
-                    input_field.send_keys("Test")
+                    stream_thread = Thread(target=self.start_streaming_answer, args=(label,))
+                    stream_thread.start()
+
+                    while stream_thread.is_alive() or not self.answer_queue.empty():
+                        try:
+                            part = self.answer_queue.get(timeout=0.1)  # Wait briefly for a new part
+                            input_field.send_keys(part)
+                        except Empty:
+                            pass 
+                    
+
+                    stream_thread.join()
                     time.sleep(2)
 
 
@@ -257,6 +273,12 @@ class LinkedInAutomation:
         except Exception as e:
             print(f"Error applying to job: {e}")
             return False
+    
+    def start_streaming_answer(self, label):
+        asyncio.run(self.stream_response(label))
+    async def stream_response(self, question: str):
+        async for part in self.generator.answer_question_stream(question):
+            self.answer_queue.put(part['response'])
 
 
     def select_dropdown_option(self, dropdown: str, option: str):
